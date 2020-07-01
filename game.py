@@ -27,13 +27,19 @@ stage_1 = True
 stage_2 = False
 
 speed_1 = 3.
-speed_2 = 0.
-mass_1 = 40.
+speed_2 = -1.
+mass_1 = 200.
 mass_2 = 20.
 mu = 0.5  # коэффициент трения скольжения
-mode = True  # Упругий удар (true) не упругий удар (false)
+mode = True # Упругий удар (true) не упругий удар (false)
 
 font = pygame.font.Font(None, 36)
+speed1_after1 = 0
+speed2_after1 = 0
+speed1_after2 = 0
+speed2_after2 = 0
+
+counter = 0
 
 running = True
 while running:
@@ -60,12 +66,18 @@ while running:
     # Вычисления
     if stage_1:
         speed_1 = max(speed_1 - mu * 10 / FPS / 100, 0)
-        speed_2 = max(speed_2 - mu * 10 / FPS / 100, 0)
+        if speed_2 < 0:
+            speed_2 = speed_2 + mu * 10 / FPS / 100
+        else:
+            speed_2 = max(speed_2 - mu * 10 / FPS / 100, 0)
         if RECT_1X + speed_1 <= RECT_2X - RECT_WIDTH:
             RECT_1X += speed_1
         elif RECT_1X + RECT_WIDTH < RECT_2X:
             RECT_1X = RECT_2X - RECT_WIDTH
         else:
+            speed1_after1 = speed_1
+            speed2_after1 = speed_2
+
             if not mode:
                 speed_1 = (mass_1 * speed_1 + mass_2 * speed_2) / (mass_1 + mass_2)
                 speed_2 = speed_1
@@ -80,7 +92,11 @@ while running:
             RECT_2X += speed_2
 
     elif stage_2:
-
+        text = font.render('U01 = ' + str(round(speed1_after1, 2)), True, BLACK)
+        screen.blit(text, (WIDTH // 4 - 50, 350))
+        text = font.render('U02 = ' + str(round(speed2_after1, 2)), True, BLACK)
+        screen.blit(text, (WIDTH * 3 // 4 - 50, 350))
+        counter += 1
         if speed_1 <= 0:
             speed_1 = min(speed_1 + mu * 10 / FPS / 100, 0)
         else:
@@ -90,6 +106,15 @@ while running:
             speed_2 = min(speed_2 + mu * 10 / FPS / 100, 0)
         else:
             speed_2 = speed_2 - mu * 10 / FPS / 100
+        if counter == 1:
+            speed1_after2 = speed_1
+            speed2_after2 = speed_2
+            text11 = font.render('U11 = ' + str(round(speed1_after2, 2)), True, BLACK)
+            text12 = font.render('U12 = ' + str(round(speed2_after2, 2)), True, BLACK)
+
+        screen.blit(text11, (WIDTH // 4 - 50, 450))
+
+        screen.blit(text12, (WIDTH * 3 // 4 - 50, 450))
 
         RECT_1X += speed_1
         RECT_2X += speed_2
