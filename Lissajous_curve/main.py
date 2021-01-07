@@ -66,4 +66,4 @@ def update_graph(w1, w2, d, x0, y0):
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(host='0.0.0.0', port=5000)
